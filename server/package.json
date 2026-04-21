@@ -1,0 +1,15 @@
+{
+  "name": "wangdianfapiaotianxieqi-ocr-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local OCR bridge for the Wangdian invoice helper Chrome extension.",
+  "type": "module",
+  "scripts": {
+    "bridge": "node bridge.js",
+    "start": "node bridge.js",
+    "dev": "node --watch bridge.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

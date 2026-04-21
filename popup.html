@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>网店发票填写器</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Chrome 扩展</p>
+          <h1>网店发票填写器</h1>
+        </div>
+        <span id="bridgeState" class="pill neutral">待识别</span>
+      </header>
+
+      <section class="panel status-panel" aria-live="polite">
+        <div>
+          <span class="label">当前状态</span>
+          <strong id="statusText">准备就绪</strong>
+        </div>
+        <div class="metric">
+          <span class="label">识别合计</span>
+          <strong id="recognizedTotal">--</strong>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <h2>识别账单</h2>
+          <button id="captureButton" class="primary" type="button">识别网店账单</button>
+        </div>
+        <div id="messageList" class="messages" hidden></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <h2>开票模板</h2>
+          <button id="saveTemplateButton" class="ghost" type="button">保存</button>
+        </div>
+        <form id="templateForm" class="form">
+          <label>
+            <span>购买方名称</span>
+            <input name="buyerName" autocomplete="organization" placeholder="公司或店铺名称">
+          </label>
+          <label>
+            <span>购买方税号</span>
+            <input name="buyerTaxNo" autocomplete="off" placeholder="统一社会信用代码">
+          </label>
+          <div class="row">
+            <label>
+              <span>项目名称</span>
+              <input name="itemName" autocomplete="off" placeholder="商品或服务名称">
+            </label>
+            <label>
+              <span>税率</span>
+              <input name="taxRate" inputmode="decimal" placeholder="0.01">
+            </label>
+          </div>
+          <label>
+            <span>备注</span>
+            <textarea name="remark" rows="2" placeholder="选填"></textarea>
+          </label>
+        </form>
+      </section>
+
+      <footer class="actions">
+        <button id="fillButton" class="primary wide" type="button">填充税局开票页</button>
+        <button id="clearBatchButton" class="ghost" type="button">清除批次</button>
+      </footer>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "网店发票填写器",
+  "version": "0.1.0",
+  "description": "识别网店账单截图，并辅助填充厦门电子税务局蓝字发票页面。",
+  "action": {
+    "default_title": "网店发票填写器",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://dppt.xiamen.chinatax.gov.cn:8443/*",
+    "http://127.0.0.1:8765/*"
+  ]
+}
