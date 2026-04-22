@@ -255,7 +255,7 @@ class StdioMcpClient {
     this.env = env;
     this.nextId = 1;
     this.pending = new Map();
-    this.buffer = Buffer.alloc(0);
+    this.textBuffer = "";
     this.stderr = "";
   }
 
@@ -271,7 +271,7 @@ class StdioMcpClient {
       };
 
       this.child.once("error", failStartup);
-      this.child.stdout.on("data", (chunk) => this.onData(chunk));
+      this.child.stdout.on("data", (chunk) => this.onData(chunk.toString("utf8")));
       this.child.stderr.on("data", (chunk) => {
         this.stderr += chunk.toString("utf8");
         if (this.stderr.length > 4000) this.stderr = this.stderr.slice(-4000);
@@ -309,33 +309,24 @@ class StdioMcpClient {
   }
 
   send(message) {
-    const body = Buffer.from(JSON.stringify(message), "utf8");
-    this.child.stdin.write(`Content-Length: ${body.length}\r\n\r\n`);
-    this.child.stdin.write(body);
+    this.child.stdin.write(`${JSON.stringify(message)}\n`);
   }
 
-  onData(chunk) {
-    this.buffer = Buffer.concat([this.buffer, chunk]);
+  onData(text) {
+    this.textBuffer += text;
+    const lines = this.textBuffer.split(/\r?\n/);
+    this.textBuffer = lines.pop() ?? "";
 
-    while (true) {
-      const headerEnd = this.buffer.indexOf("\r\n\r\n");
-      if (headerEnd === -1) return;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || /^Content-Length:/i.test(trimmed)) continue;
 
-      const header = this.buffer.slice(0, headerEnd).toString("utf8");
-      const lengthMatch = header.match(/Content-Length:\s*(\d+)/i);
-      if (!lengthMatch) {
-        this.buffer = this.buffer.slice(headerEnd + 4);
-        continue;
+      try {
+        this.handleMessage(JSON.parse(trimmed));
+      } catch {
+        this.stderr += `\nUnparseable MCP stdout: ${trimmed}`;
+        if (this.stderr.length > 4000) this.stderr = this.stderr.slice(-4000);
       }
-
-      const contentLength = Number.parseInt(lengthMatch[1], 10);
-      const messageStart = headerEnd + 4;
-      const messageEnd = messageStart + contentLength;
-      if (this.buffer.length < messageEnd) return;
-
-      const raw = this.buffer.slice(messageStart, messageEnd).toString("utf8");
-      this.buffer = this.buffer.slice(messageEnd);
-      this.handleMessage(JSON.parse(raw));
     }
   }
 
